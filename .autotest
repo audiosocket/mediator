@@ -1,0 +1,63 @@
+require "autotest/restart"
+
+Autotest.add_hook :initialize do |at|
+  at.testlib = "minitest/autorun"
+
+  # Autotest's defaults don't match our idiom, so we'll build the
+  # mappings by hand.
+
+  at.clear_mappings
+
+  # Changed tests always run themselves.
+
+  at.add_mapping %r{^test/.*_test.rb$} do |f, _|
+    [f]
+  end
+
+  # Run corresponding unit tests if something in lib changes.
+
+  at.add_mapping %r{^(?:lib)/(.*)\.rb$} do |f, m|
+    ["test/#{m[1]}_test.rb"]
+  end
+
+  at.add_exception ".autotest"
+  at.add_exception ".git"
+  at.add_exception "Gemfile"
+  at.add_exception "README.md"
+  at.add_exception "Rakefile"
+  at.add_exception "mediator.gemspec"
+  at.add_exception "pkg"
+end
+
+class Autotest
+  TESTFILES = Dir["test/*_test.rb"]
+
+  # Because MiniTest::Spec's generated class names (very
+  # understandably) can't map reliably to test files, try to guess a
+  # file by turning the describe block's class name into a file path
+  # and gradually making it more general until something matches.
+
+  def consolidate_failures failed
+    filters = new_hash_of_arrays
+
+    failed.each do |method, klass|
+      fragments = klass.sub(/Spec$/, "").
+        gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
+        gsub(/([a-z\d])([A-Z])/,'\1_\2').
+        downcase.split "_"
+
+      until fragments.empty?
+        candidate = "test/#{fragments.join '_'}_test.rb"
+
+        if TESTFILES.include? candidate
+          filters[candidate] << method
+          break
+        end
+
+        fragments.pop
+      end
+    end
+
+    filters
+  end
+end
