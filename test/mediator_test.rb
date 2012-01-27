@@ -32,6 +32,33 @@ describe Mediator do
       assert Mediator.new(:s, m).nested?
     end
 
+    it "can test if it is nested inside a specific parent's subject." do
+      m = OpenStruct.new bar: "gni"
+      n = Mediator.new m, :t
+      o = Mediator.new :u, n
+
+      refute n.nested? m
+      assert o.nested? m
+    end
+
+    it "can test up in inheritance tree." do
+      m = OpenStruct.new bar: "gni"
+      n = Mediator.new m, :t
+      o = Mediator.new :u, n
+      v = Mediator.new :u, o
+
+      assert v.nested? m
+    end
+
+    it "accepts an arbitrary block to test against parent." do
+      m = OpenStruct.new bar: "gni"
+      n = Mediator.new m, :t
+      o = Mediator.new :u, n
+
+      refute o.nested? { |p| p.subject.bar == "gno" }
+      assert o.nested? { |p| p.subject.bar == "gni" }
+    end
+
     it "can narrow inside? by checking subjects" do
       m = Mediator.new :s, :c
       n = Mediator.new :t, m

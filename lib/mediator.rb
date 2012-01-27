@@ -62,8 +62,22 @@ class Mediator
 
   # Is this mediator nested inside a `parent`?
 
-  def nested?
-    !!parent
+  def nested? candidate = nil, &block
+    if candidate && block
+      raise Error, "Can't provide both a candidate and a block."
+    end
+
+    if !parent
+      false
+    elsif !candidate && !block
+      true
+    elsif candidate && parent.subject == candidate
+      true
+    elsif block && block[parent]
+      true
+    else
+      parent.nested? candidate, &block
+    end
   end
 
   # Called after rendering. Subclasses can override to transform raw
