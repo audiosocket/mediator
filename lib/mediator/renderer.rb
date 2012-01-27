@@ -10,6 +10,14 @@ class Mediator
       @mediator = mediator
     end
 
+    def coll name, options = nil, &block
+      value = get name, options
+      data[name] = value.map do |value|
+        rendered = Mediator[value, mediator].render
+        block ? block[rendered] : rendered
+      end
+    end
+
     def get name, options = nil
       selector = (options && options[:from]) || name
       (options && options[:value]) || mediator.get(selector)

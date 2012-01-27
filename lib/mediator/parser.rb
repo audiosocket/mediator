@@ -10,6 +10,8 @@ class Mediator
       @mediator = mediator
     end
 
+    # TODO: def coll
+
     def get name, options = nil
       selector = (options && options[:from]) || name
       (options && options[:value]) || data[selector] || data[selector.to_s]

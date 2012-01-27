@@ -11,6 +11,59 @@ describe Mediator::Renderer do
   it "has data" do
     assert_equal Hash.new, Mediator::Renderer.new(nil).data
   end
+  
+  describe "coll" do
+    it "grabs a collection from the subject" do
+      c = Class.new Mediator do
+        def render! r
+          r.coll :foo
+        end
+      end
+
+      d = Class.new Mediator do
+        accept OpenStruct
+
+        def render! r
+          r.key :bar
+        end
+      end
+
+      x = OpenStruct.new bar: "gni"
+      y = OpenStruct.new bar: "gno"
+      s = OpenStruct.new foo: [x, y]
+      m = c.new s
+      d = m.render
+
+      r = { foo: [ { bar: "gni" }, { bar: "gno" } ] }
+      assert_equal r, d
+    end
+
+    it "can alter values" do
+      c = Class.new Mediator do
+        def render! r
+          r.coll(:foo) { |v| { bar: v[:bar].upcase } }
+        end
+      end
+
+      d = Class.new Mediator do
+        accept OpenStruct
+
+        def render! r
+          r.key :bar
+        end
+      end
+
+      x = OpenStruct.new bar: "gni"
+      y = OpenStruct.new bar: "gno"
+      s = OpenStruct.new foo: [x, y]
+      m = c.new s
+      d = m.render
+
+      r = { foo: [ { bar: "GNI" }, { bar: "GNO" } ] }
+      assert_equal r, d
+    end
+  end
+
 
   describe "key" do
     it "grabs the value from the subject" do
