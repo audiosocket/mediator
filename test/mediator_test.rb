@@ -50,14 +50,6 @@ describe Mediator do
       assert o.nested? { |p| p.subject.bar == "gni" }
     end
 
-    it "takes a specific model over an arbitrary block to test against parent when both are specified" do
-      m = OpenStruct.new bar: "gni"
-      n = Mediator.new m, :t
-      o = Mediator.new :u, n
-
-      assert o.nested?(m) { |p| p.subject.bar == "gni" }
-    end
-
     it "can narrow inside? by checking subjects" do
       m = Mediator.new :s, :c
       n = Mediator.new :t, m
