@@ -33,7 +33,13 @@ describe Mediator::Parser do
     before do
       @parser = Mediator::Parser.new @mediator,
         emptystring: "", emptyarray: [], isnil: nil,
-        predicate: true
+        somevalue: :gni, predicate: true
+    end
+
+    it "parses some values" do
+      @parser.key :somevalue
+
+      assert_equal :gni, @subject.somevalue
     end
 
     it "sets unconditionally with empty: true" do
@@ -47,7 +53,6 @@ describe Mediator::Parser do
       @parser.key :predicate?
       assert @subject.predicate
     end
-
 
     it "can pull from the options hash" do
       @parser.key :foo, value: :bar
@@ -65,6 +70,11 @@ describe Mediator::Parser do
     it "ignores nil values" do
       @parser.key :isnil
       assert_nil @subject.isnil # heh
+    end
+
+    it "ignores nil or empty values returned by blocks" do
+      @parser.key(:somevalue) { |p| nil }
+      assert_nil @subject.foo # heh
     end
   end
 

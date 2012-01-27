@@ -28,7 +28,9 @@ class Mediator
       value = get name, options
       return if empty? value, options
 
-      data[name] = block ? block[value] : value
+      value = block ? block[value] : value
+
+      data[name] = value unless empty? value, options
     end
 
     def many name, options = nil, &block
