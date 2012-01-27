@@ -12,11 +12,11 @@ describe Mediator::Renderer do
     assert_equal Hash.new, Mediator::Renderer.new(nil).data
   end
   
-  describe "coll" do
+  describe "many" do
     it "grabs a collection from the subject" do
       c = Class.new Mediator do
         def render! r
-          r.coll :foo
+          r.many :foo
         end
       end
 
@@ -41,7 +41,7 @@ describe Mediator::Renderer do
     it "can alter values" do
       c = Class.new Mediator do
         def render! r
-          r.coll(:foo) { |v| { bar: v[:bar].upcase } }
+          r.many(:foo) { |v| { bar: v[:bar].upcase } }
         end
       end
 
@@ -60,6 +60,31 @@ describe Mediator::Renderer do
       d = m.render
 
       r = { foo: [ { bar: "GNI" }, { bar: "GNO" } ] }
+      assert_equal r, d
+    end
+
+    it "removes empty values" do
+      c = Class.new Mediator do
+        def render! r
+          r.many :foo
+        end
+      end
+
+      d = Class.new Mediator do
+        accept OpenStruct
+
+        def render! r
+          r.key :bar if subject.bar == "gni"
+        end
+      end
+
+      x = OpenStruct.new bar: "gni"
+      y = OpenStruct.new bar: "gno"
+      s = OpenStruct.new foo: [x, y]
+      m = c.new s
+      d = m.render
+
+      r = { foo: [ { bar: "gni" } ] }
       assert_equal r, d
     end
   end
@@ -167,11 +192,11 @@ describe Mediator::Renderer do
     end
   end
 
-  describe "obj" do
+  describe "one" do
     it "allows mediation of an associated object" do
       c = Class.new Mediator do
         def render! r
-          r.obj :foo
+          r.one :foo
         end
       end
 

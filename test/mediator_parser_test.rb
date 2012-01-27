@@ -98,7 +98,7 @@ describe Mediator::Parser do
     end
   end
 
-  describe "obj" do
+  describe "one" do
     before do
       Top  = Class.new OpenStruct
       Nest = Class.new OpenStruct
@@ -108,7 +108,7 @@ describe Mediator::Parser do
 
         def parse! p
           p.key :foo
-          p.obj :nest
+          p.one :nest
         end
       end
 
@@ -134,6 +134,41 @@ describe Mediator::Parser do
       assert_equal d[:foo],         s.foo
       assert_equal d[:nest][:baz],  s.nest.baz
       assert_equal d[:nest][:quux], s.nest.quux
+    end
+  end
+
+  describe "many" do
+    before do
+      Many   = Class.new OpenStruct
+      Nested = Class.new OpenStruct 
+
+      Class.new Mediator do
+        accept Many
+
+        def parse! p
+          p.many :nest
+        end
+      end
+
+      Class.new Mediator do
+        accept Nested
+
+        def parse! p
+          p.key :baz
+        end
+      end
+    end
+
+    it "delegates to an array of nested mediator" do
+      s      = Many.new
+      s.nest = [ Nested.new, Nested.new ]
+
+      m = Mediator[s]
+      d = { nest: [ { baz: "baz!" }, { baz: "blup?" } ] }
+
+      m.parse d
+
+      assert_equal d[:nest].map { |v| v[:baz] },  s.nest.map { |v| v.baz }
     end
   end
 
