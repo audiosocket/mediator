@@ -31,23 +31,33 @@ class Mediator
       data[name] = block ? block[value] : value
     end
 
-    def obj name, options = nil, &block
+    def many name, options = nil, &block
+      value = get name, options
+      data[name] = value.map { |v| sub v, options, &block }.
+        reject { |v| empty? v, options }
+    end
+
+    def one name, options = nil, &block
       value = get name, options
       return if empty? value, options
+ 
+      value = sub value, options, &block 
+      return if empty? value, options
 
-      if value
-        rendered = Mediator[value, mediator].render
-        munged   = block ? block[rendered] : rendered
-        merge    = options && options[:merge]
-
-        merge ? data.merge!(munged) : data[name] = munged
-        munged
-      end
+      options && options[:merge] ? data.merge!(value) : data[name] = value
     end
 
     def union name, options = nil, &block
       (options ||= {}).merge! merge: true
-      obj name, options, &block
+      one name, options, &block
     end
+
+    private
+
+    def sub value, options, &block
+      rendered = Mediator[value, mediator].render
+      block ? block[rendered] : rendered
+    end
+
   end
 end
