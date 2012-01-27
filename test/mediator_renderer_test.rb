@@ -55,6 +55,20 @@ describe Mediator::Renderer do
       assert_equal Hash.new, d
     end
 
+    it "ignores nil or empty values returned by blocks" do
+      c = Class.new Mediator do
+        def render! r
+          r.key(:foo) { |p| nil }
+        end
+      end
+
+      s = OpenStruct.new foo: "bar"
+      m = c.new s
+      d = m.render
+
+      assert_equal Hash.new, d
+    end
+
     it "optionally allows empty values" do
       c = Class.new Mediator do
         def render! r
