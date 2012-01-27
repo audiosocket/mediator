@@ -41,6 +41,15 @@ describe Mediator do
       assert o.nested? m
     end
 
+    it "can test up in inheritance tree." do
+      m = OpenStruct.new bar: "gni"
+      n = Mediator.new m, :t
+      o = Mediator.new :u, n
+      v = Mediator.new :u, o
+
+      assert v.nested? m
+    end
+
     it "accepts an arbitrary block to test against parent." do
       m = OpenStruct.new bar: "gni"
       n = Mediator.new m, :t
