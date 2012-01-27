@@ -60,15 +60,6 @@ class Mediator
     parent && (parent.subject == subject || parent.inside?(subject))
   end
 
-  # Two-way mediation. Mediators whose parsing and rendering
-  # operations are identical should override and consistently call
-  # `super`. `mediator` will be `parser` or `renderer`. The default
-  # implementation raises NotImplementedError.
-
-  def mediate! mediator
-    raise NotImplementedError
-  end
-
   # Is this mediator nested inside a `parent`?
 
   def nested?
@@ -93,11 +84,10 @@ class Mediator
   end
 
   # The actual parse implementation. Subclasses should override and
-  # consistently call `super`. The default implementation calls
-  # `mediate!`.
+  # consistently call `super`.
 
   def parse! parser
-    mediate! parser
+    raise NotImplementedError
   end
 
   # Construct a parser instance for `data`. The parser will be passed
@@ -119,11 +109,10 @@ class Mediator
   end
 
   # The actual render implementation. Subclasses should override and
-  # consistently call `super`. The default implementation calls
-  # `mediate!`.
+  # consistently call `super`.
 
   def render! renderer
-    mediate! renderer
+    raise NotImplementedError
   end
 
   # Construct a renderer instance. The renderer will be passed to the
