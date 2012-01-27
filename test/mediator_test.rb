@@ -65,20 +65,6 @@ describe Mediator do
       assert_equal :bar, s.foo
     end
 
-    it "falls back on mediate!" do
-      c = Class.new Mediator do
-        def mediate! m
-          m.key :foo
-        end
-      end
-
-      s = OpenStruct.new
-      m = c.new s
-
-      m.parse foo: :bar
-      assert_equal :bar, s.foo
-    end
-
     it "always returns the subject" do
       c = Class.new Mediator do
         def parse! p
