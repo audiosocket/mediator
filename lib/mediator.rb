@@ -62,8 +62,12 @@ class Mediator
 
   # Is this mediator nested inside a `parent`?
 
-  def nested?
-    !!parent
+  def nested? model = nil, &block
+    return false unless !!parent
+    
+    return parent.subject == model if model
+   
+    block ? block[parent] : true 
   end
 
   # Called after rendering. Subclasses can override to transform raw
