@@ -23,6 +23,10 @@ class Mediator
       key "#{name}_id", options.merge(from: name)
     end
 
+    def ids name, options = {}
+      key "#{name}_ids", options.merge(from: name) 
+    end
+
     def key name, options = nil, &block
       if name[-1] == "?"
         name = name[0..-2].intern

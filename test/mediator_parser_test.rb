@@ -29,6 +29,15 @@ describe Mediator::Parser do
     end
   end
 
+  describe "ids" do
+    it "translates name to subject.name_ids" do
+      p = Mediator::Parser.new @mediator, foo: [5, 6, 7]
+
+      p.ids :foo
+      assert_equal [5, 6, 7], @subject.foo_ids
+    end
+  end
+
   describe "key" do
     before do
       @parser = Mediator::Parser.new @mediator,
