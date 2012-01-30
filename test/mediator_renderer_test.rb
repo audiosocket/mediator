@@ -42,6 +42,34 @@ describe Mediator::Renderer do
 
       assert_equal r, m.render
     end
+
+    it "removes plurial" do
+      c = Class.new Mediator do
+        def render! r
+          r.ids :foos
+        end
+      end
+
+      x = OpenStruct.new foo_ids: [5, 6, 7]
+      m = c.new x
+      r = { foos: [5, 6, 7] }
+
+      assert_equal r, m.render
+    end
+
+    it "does not remove plurial if told to" do
+      c = Class.new Mediator do
+        def render! r
+          r.ids :foos, no_strip_plurial: true
+        end
+      end
+
+      x = OpenStruct.new foos_ids: [5, 6, 7]
+      m = c.new x
+      r = { foos: [5, 6, 7] }
+
+      assert_equal r, m.render
+    end
   end
 
   describe "many" do
