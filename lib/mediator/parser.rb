@@ -25,7 +25,7 @@ class Mediator
 
     def ids name, options = {}
       if name[-1] == "s" and !options[:from]
-        id_name = "#{name[0..-2].intern}_ids"
+        id_name = "#{name[0..-2]}_ids"
       else
         id_name = "#{name}_ids"
       end
