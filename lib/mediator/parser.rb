@@ -30,7 +30,7 @@ class Mediator
         id_name = "#{name}_ids"
       end
 
-      options = options.merge(from: name) unless options[:from]
+      options[:from] ||= name
 
       key id_name, options
     end

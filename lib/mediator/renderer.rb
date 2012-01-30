@@ -22,7 +22,7 @@ class Mediator
     def ids name, options = {}
       unless options[:from]
         if name[-1] == "s"
-          options = options.merge(from: "#{name[0..-2].intern}_ids")
+          options = options.merge(from: "#{name[0..-2]}_ids")
         else
           options = options.merge(from: "#{name}_ids")
         end
