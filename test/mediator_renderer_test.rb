@@ -11,7 +11,67 @@ describe Mediator::Renderer do
   it "has data" do
     assert_equal Hash.new, Mediator::Renderer.new(nil).data
   end
-  
+
+  describe "id" do
+    it "grabs an id" do
+      c = Class.new Mediator do
+        def render! r
+          r.id :foo
+        end
+      end
+
+      x = OpenStruct.new foo_id: 5
+      m = c.new x
+      r = { foo: 5 }
+
+      assert_equal r, m.render
+    end
+  end
+
+  describe "ids" do
+    it "grabs an array of ids" do
+      c = Class.new Mediator do
+        def render! r
+          r.ids :foo
+        end
+      end
+
+      x = OpenStruct.new foo_ids: [5, 6, 7]
+      m = c.new x
+      r = { foo: [5, 6, 7] }
+
+      assert_equal r, m.render
+    end
+
+    it "removes plurial" do
+      c = Class.new Mediator do
+        def render! r
+          r.ids :foos
+        end
+      end
+
+      x = OpenStruct.new foo_ids: [5, 6, 7]
+      m = c.new x
+      r = { foos: [5, 6, 7] }
+
+      assert_equal r, m.render
+    end
+
+    it "can be clever with plurial if told to" do
+      c = Class.new Mediator do
+        def render! r
+          r.ids :boxen, from: "box_ids"
+        end
+      end
+
+      x = OpenStruct.new box_ids: [5, 6, 7]
+      m = c.new x
+      r = { boxen: [5, 6, 7] }
+
+      assert_equal r, m.render
+    end
+  end
+
   describe "many" do
     it "grabs a collection from the subject" do
       c = Class.new Mediator do

@@ -29,6 +29,29 @@ describe Mediator::Parser do
     end
   end
 
+  describe "ids" do
+    it "translates name to subject.name_ids" do
+      p = Mediator::Parser.new @mediator, foo: [5, 6, 7]
+
+      p.ids :foo
+      assert_equal [5, 6, 7], @subject.foo_ids
+    end
+
+    it "removes plurial" do
+      p = Mediator::Parser.new @mediator, foos: [5, 6, 7]
+
+      p.ids :foos
+      assert_equal [5, 6, 7], @subject.foo_ids
+    end
+
+    it "can be clever with plurial if told to" do
+      p = Mediator::Parser.new @mediator, boxen: [5, 6, 7]
+
+      p.ids :box, from: :boxen
+      assert_equal [5, 6, 7], @subject.box_ids
+    end
+  end
+
   describe "key" do
     before do
       @parser = Mediator::Parser.new @mediator,
