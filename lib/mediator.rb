@@ -71,7 +71,7 @@ class Mediator
       false
     elsif !candidate && !block
       true
-    elsif candidate && (parent.subject == candidate || parent.subject.class == candidate)
+    elsif candidate  && (candidate === parent.subject)
       true
     elsif block && block[parent]
       true
