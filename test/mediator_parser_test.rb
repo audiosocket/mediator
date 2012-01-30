@@ -44,11 +44,11 @@ describe Mediator::Parser do
       assert_equal [5, 6, 7], @subject.foo_ids
     end
 
-    it "does not remove plurial if told to" do
-      p = Mediator::Parser.new @mediator, foos: [5, 6, 7]
+    it "can be clever with plurial if told to" do
+      p = Mediator::Parser.new @mediator, boxen: [5, 6, 7]
 
-      p.ids :foos, no_strip_plurial: true
-      assert_equal [5, 6, 7], @subject.foos_ids
+      p.ids :box, from: :boxen
+      assert_equal [5, 6, 7], @subject.box_ids
     end
   end
 

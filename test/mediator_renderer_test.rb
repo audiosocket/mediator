@@ -57,16 +57,16 @@ describe Mediator::Renderer do
       assert_equal r, m.render
     end
 
-    it "does not remove plurial if told to" do
+    it "can be clever with plurial if told to" do
       c = Class.new Mediator do
         def render! r
-          r.ids :foos, no_strip_plurial: true
+          r.ids :boxen, from: "box_ids"
         end
       end
 
-      x = OpenStruct.new foos_ids: [5, 6, 7]
+      x = OpenStruct.new box_ids: [5, 6, 7]
       m = c.new x
-      r = { foos: [5, 6, 7] }
+      r = { boxen: [5, 6, 7] }
 
       assert_equal r, m.render
     end

@@ -24,13 +24,15 @@ class Mediator
     end
 
     def ids name, options = {}
-      if name[-1] == "s" and !options[:no_strip_plurial]
-        id_name = name[0..-2].intern
+      if name[-1] == "s" and !options[:from]
+        id_name = "#{name[0..-2].intern}_ids"
       else
-        id_name = name
+        id_name = "#{name}_ids"
       end
 
-      key "#{id_name}_ids", options.merge(from: name) 
+      options = options.merge(from: name) unless options[:from]
+
+      key id_name, options
     end
 
     def key name, options = nil, &block
