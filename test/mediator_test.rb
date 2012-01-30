@@ -39,6 +39,7 @@ describe Mediator do
 
       refute n.nested? m
       assert o.nested? m
+      assert o.nested? OpenStruct
     end
 
     it "can test up in inheritance tree." do
