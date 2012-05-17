@@ -15,8 +15,9 @@ class Mediator
       (options && options[:value]) || data[selector] || data[selector.to_s]
     end
 
-    def has? name
-      !!get(name)
+    def has? name, options = nil
+      selector = (options && options[:from]) || name
+      (options && options.has_key?(:value)) || data.has_key?(selector) || data.has_key?(selector.to_s)
     end
 
     def id name, options = {}
@@ -39,6 +40,8 @@ class Mediator
       if name[-1] == "?"
         name = name[0..-2].intern
       end
+
+      return unless has? name, options
 
       value = get name, options
       return if empty? value, options

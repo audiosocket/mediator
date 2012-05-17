@@ -54,9 +54,11 @@ describe Mediator::Parser do
 
   describe "key" do
     before do
-      @parser = Mediator::Parser.new @mediator,
+      @data = {
         emptystring: "", emptyarray: [], isnil: nil,
-        somevalue: :gni, predicate: true
+        somevalue: :gni, predicate: true, othernil: nil
+      }
+      @parser = Mediator::Parser.new @mediator, @data
     end
 
     it "parses some values" do
@@ -65,11 +67,20 @@ describe Mediator::Parser do
       assert_equal :gni, @subject.somevalue
     end
 
-    it "sets unconditionally with empty: true" do
+    it "sets unconditionally with empty: true and data holds an empty value for that key." do
+      @subject.othernil = :not_nil
+
+      assert @data.has_key?(:othernil)
+      @parser.key :othernil, empty: true
+      assert_nil @subject.othernil
+    end
+
+    it "does not touch a key with empty: true when data does not have that key defined." do
       @subject.foo = :foo
 
+      refute @data.has_key?(:foo)
       @parser.key :foo, empty: true
-      assert_nil @subject.foo
+      assert_equal :foo, @subject.foo
     end
 
     it "removes trailing '?' from predicates" do
