@@ -17,7 +17,7 @@ class Mediator
 
     def has? name, options = nil
       selector = (options && options[:from]) || name
-      (options && options.has_key?(:value)) || data.has_key?(selector) || data.has_key?(selector.to_s)
+      (options && options.has_key?(:value))  || mediator.data_has?(data,selector)
     end
 
     def id name, options = {}

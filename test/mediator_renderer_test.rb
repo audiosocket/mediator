@@ -278,6 +278,28 @@ describe Mediator::Renderer do
 
       assert_equal "bar", d[:foo]      
     end
+
+    it "can define its own access to data" do
+      c = Class.new Mediator do
+        def construct name
+          subject[name]
+        end
+
+        def subject_has? name
+          !!subject[name]
+        end
+
+        def render! r
+          r.key :foo
+        end
+      end
+
+      s = { :foo => "bar" }
+      m = c.new s
+      d = m.render
+
+      assert_equal "bar", d[:foo]
+    end
   end
 
   describe "one" do

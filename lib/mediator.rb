@@ -137,17 +137,26 @@ class Mediator
     Mediator::Renderer.new self
   end
 
+  # True if subject can construct a value for name
+
+  def subject_has? name
+    subject.respond_to?(name) || subject.respond_to?(name.to_s)
+  end
+
+  # True if data can return a value for name
+  
+  def data_has? data, name
+    data.has_key?(name) || data.has_key?(name.to_s)
+  end
+
   # Gets the `name` property from `subject`. The default
   # implementation calls the `name` method if it exists.
 
   def get name
     value = subject.send name if subject.respond_to? name
-    
-    return value unless value.nil?
+    value = construct name    if value.nil?
 
-    value ||= construct name
-
-    getting name, value if value
+    getting name, value       unless value.nil?
   end
 
   # Called when getting `name` from `subject`. Can be used to
