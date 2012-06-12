@@ -141,7 +141,10 @@ class Mediator
   # implementation calls the `name` method if it exists.
 
   def get name
-    value   = subject.send name if subject.respond_to? name
+    value = subject.send name if subject.respond_to? name
+    
+    return value unless value.nil?
+
     value ||= construct name
 
     getting name, value if value

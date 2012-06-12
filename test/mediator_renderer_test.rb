@@ -179,6 +179,20 @@ describe Mediator::Renderer do
       assert d[:foo]
     end
 
+    it "Works with false boolean" do
+      c = Class.new Mediator do
+        def render! r
+          r.key :foo
+        end
+      end
+
+      s = OpenStruct.new foo: false
+      m = c.new s
+      d = m.render
+
+      assert_equal false, d[:foo]
+    end
+
     it "ignores nil or empty values" do
       c = Class.new Mediator do
         def render! r
