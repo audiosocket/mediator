@@ -221,7 +221,7 @@ describe Mediator::Renderer do
       assert_equal Hash.new, d
     end
 
-    it "optionally allows empty values when defined" do
+    it "optionally allows empty values" do
       c = Class.new Mediator do
         def render! r
           r.key :foo, empty: true
@@ -229,25 +229,9 @@ describe Mediator::Renderer do
       end
 
       s = OpenStruct.new
-      s.foo = nil
       m = c.new s
       d = m.render
       e = { foo: nil }
-
-      assert_equal e, d
-    end
-
-    it "ditches empty values when not defined in any case" do
-      c = Class.new Mediator do
-        def render! r
-          r.key :foo, empty: true
-        end
-      end
-
-      s = OpenStruct.new
-      m = c.new s
-      d = m.render
-      e = { }
 
       assert_equal e, d
     end

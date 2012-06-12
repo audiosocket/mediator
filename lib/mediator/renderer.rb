@@ -15,11 +15,6 @@ class Mediator
       (options && options[:value]) || mediator.get(selector)
     end
 
-    def has? name, options = nil
-      selector = (options && options[:from]) || name
-      (options && options.has_key?(:value)) || mediator.subject.respond_to?(selector) || mediator.subject.respond_to?(selector.to_s)
-    end
-
     def id name, options = {}
       key name, options.merge(from: "#{name}_id")
     end
@@ -41,8 +36,6 @@ class Mediator
         (options ||= {})[:from] = name
         name = name[0..-2].intern
       end
-
-      return unless has? name, options
 
       value = get name, options
       return if empty? value, options
