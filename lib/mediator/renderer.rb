@@ -74,7 +74,7 @@ class Mediator
     private
 
     def sub value, options, &block
-      rendered = Mediator[value, mediator].render
+      rendered = Mediator[value, context: mediator].render
       block ? block[rendered] : rendered
     end
 

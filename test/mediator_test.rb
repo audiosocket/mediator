@@ -4,7 +4,7 @@ require "ostruct"
 
 describe Mediator do
   before do
-    Mediator.map.clear
+    Mediator.registries.clear
   end
 
   describe "initialization" do
@@ -266,22 +266,22 @@ describe Mediator do
       c = Class.new Mediator
       Mediator.register c, Symbol
 
-      assert_equal c, Mediator.map[Symbol]
+      assert_equal c, Mediator.registry[Symbol]
     end
 
     it "can register multiple classes" do
       c = Class.new Mediator
       Mediator.register c, String, Symbol
 
-      assert_equal c, Mediator.map[String]
-      assert_equal c, Mediator.map[Symbol]
+      assert_equal c, Mediator.registry[String]
+      assert_equal c, Mediator.registry[Symbol]
     end
 
     it "can register with a block" do
       c = Class.new Mediator
       Mediator.register(c) { |s| Symbol === s }
 
-      b = Mediator.map.keys.first
+      b = Mediator.registry.keys.first
       refute_nil b
 
       assert b[:foo]
@@ -298,9 +298,18 @@ describe Mediator do
       assert_equal "Can't provide both a subject and a block.", ex.message
     end
 
+    it "allows for alternate registry" do
+      c = Class.new Mediator
+      r = {}
+      assert_equal c, Mediator.register(c, String, registry: r)
+      assert_equal c, r[String]
+      assert_equal r, c.registered_with
+    end
+
     it "returns the registered thing" do
       c = Class.new Mediator
       assert_equal c, Mediator.register(c, String)
     end
+
   end
 end
