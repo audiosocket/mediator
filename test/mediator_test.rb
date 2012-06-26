@@ -300,10 +300,14 @@ describe Mediator do
 
     it "allows for alternate registry" do
       c = Class.new Mediator
-      r = {}
-      assert_equal c, Mediator.register(c, String, registry: r)
+      assert_equal c, Mediator.register(c, String, registry: :monkeys )
+
+      r = c.registries[:monkeys]
+      refute_nil r
+
       assert_equal c, r[String]
-      assert_equal r, c.registered_with
+      assert_equal r, c.registry(c)
+      assert_equal r, c.registries[c]
     end
 
     it "returns the registered thing" do

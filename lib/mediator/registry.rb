@@ -33,22 +33,31 @@ class Mediator
     def for subject, opts = {}
       context = opts[:context]
 
-      reg = opts[:registry] ||
-          (context.respond_to?(:registered_with) && context.registered_with)
-      
-      registry(reg).keys.reverse.each do |criteria|
-        return registry[criteria].new subject, context if criteria === subject
+      reg = registry(opts[:registry] || context)
+
+      reg.keys.reverse.each do |criteria|
+        return reg[criteria].new subject, context if criteria === subject
       end
 
       raise Error, "Can't find a Mediator for #{subject.inspect}."
     end
 
     # Returns a mediator registry. If no arg is passed the default registry
-    # is returned. 
+    # is returned. Keys can be either a symbol or a Mediator instance or class
 
-    def registry reg = nil
-      reg ||= :default
-      reg.is_a?(Symbol) ? registries[reg] : reg
+    def registry key = nil
+
+      # If key exists then see if we've got an entry already and if
+      # not force the key to be a symbol, i.e. :default, :accounting, etc.
+      
+      if key
+        return registries[key.class] if registries.key?(key.class)
+        return registries[key] if registries.key?(key)
+        key = :default unless key.is_a?(Symbol)
+      end
+      
+      key ||= :default
+      registries[key] ||= {}
     end
 
     # Sugar for `for`.
@@ -57,13 +66,12 @@ class Mediator
       self.for subject, opts
     end
 
+    # Stores a map of all the different registries.
+    #  - keys are registry symbols, i.e. :default, :account, or mediators
+    #  - values are a simple map
+    
     def registries
-      @@registries ||= Hash.new { |h,k| h[k] = {} }
-    end
-
-    def registered_with registry = nil
-      return @with if registry.nil?
-      @with = registry
+      @@registries ||= Hash.new
     end
 
     # Sugar for creating and registering a Mediator subclass.
@@ -90,12 +98,12 @@ class Mediator
         end
 
         reg_map[block] = mklass
-        mklass.registered_with(reg_map) if mklass.respond_to? :registered_with
+        registries[mklass] = reg_map
       end
 
       subjects.each do |k|
         reg_map[k] = mklass
-        mklass.registered_with(reg_map) if mklass.respond_to? :registered_with
+        registries[mklass] = reg_map
       end
 
       mklass
