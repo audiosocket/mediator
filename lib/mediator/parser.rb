@@ -76,7 +76,7 @@ class Mediator
     def sub subj, data, options, &block
       return if empty? data, options or subj.nil?
 
-      Mediator[subj, mediator].parse data
+      Mediator[subj, context: mediator].parse data
       block[subj] if block
 
       subj

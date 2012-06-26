@@ -5,7 +5,7 @@ require "ostruct"
 
 describe Mediator::Renderer do
   before do
-    Mediator.map.clear
+    Mediator.registries.clear
   end
 
   it "has data" do
