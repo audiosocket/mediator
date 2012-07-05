@@ -5,7 +5,7 @@ require "ostruct"
 
 describe Mediator::Parser do
   before do
-    Mediator.map.clear
+    Mediator.registries.clear
 
     @subject  = OpenStruct.new
     @mediator = Mediator.new @subject
