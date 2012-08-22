@@ -27,6 +27,21 @@ describe Mediator::Parser do
       p.id :foo
       assert_equal 42, @subject.foo_id
     end
+
+    it "Does nothing with empty values by default" do
+      p = Mediator::Parser.new @mediator, foo: ""
+      @subject.foo_id = 42
+
+      p.id :foo
+      assert_equal 42, @subject.foo_id
+    end
+
+    it "Accept empty values if told to" do
+      p = Mediator::Parser.new @mediator, foo: ""
+
+      p.id :foo, empty: true
+      assert_equal "", @subject.foo_id
+    end
   end
 
   describe "ids" do
