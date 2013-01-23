@@ -20,11 +20,11 @@ class Mediator
       (options && options.has_key?(:value))  || mediator.subject_has?(selector)
     end
 
-    def id name, options = {}
-      key name, options.merge(from: "#{name}_id")
+    def id name, options = {}, &block
+      key name, options.merge(from: "#{name}_id"), &block
     end
 
-    def ids name, options = {}
+    def ids name, options = {}, &block
       unless options[:from]
         if name[-1] == "s"
           options = options.merge(from: "#{name[0..-2]}_ids")
@@ -33,7 +33,7 @@ class Mediator
         end
       end
 
-      key name, options
+      key name, options, &block
     end
 
     def key name, options = nil, &block

@@ -26,6 +26,20 @@ describe Mediator::Renderer do
 
       assert_equal r, m.render
     end
+
+    it "apply a block to id value, if given" do
+      c = Class.new Mediator do
+        def render! r
+          r.id(:foo) { |v| 27 }
+        end
+      end
+
+      x = OpenStruct.new foo_id: 5
+      m = c.new x
+      r = { foo: 27 }
+
+      assert_equal r, m.render
+    end
   end
 
   describe "ids" do
@@ -205,6 +219,21 @@ describe Mediator::Renderer do
       d = m.render
 
       assert_equal Hash.new, d
+    end
+
+    it "accepts custom blocks for ids" do
+      c = Class.new Mediator do
+        def render! r
+          r.ids(:foos) { |p| [12,34,45] }
+        end
+      end
+
+      s = OpenStruct.new foo_ids: [56,78,90]
+      m = c.new s
+      d = m.render
+      e = {foos: [12,34,45]}
+
+      assert_equal e, d
     end
 
     it "ignores nil or empty values returned by blocks" do
