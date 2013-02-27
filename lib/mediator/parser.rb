@@ -52,11 +52,19 @@ class Mediator
     end
 
     def many name, options = nil, &block
-      data = get name, options
+      mediator.set name, [] if options && options[:replace]
+
+      data = get(name, options) || []
       subj = (options && options[:subject]) || mediator.get(name)
 
-      data.map { |d| sub subj[data.index d], d, options, &block }.
-        reject { |v| empty? v, options }
+      data.each do |d|
+        unless d[:id] and s = subj.detect { |s| s.id == d[:id] }
+          name = name[0..-2] if name[-1] == "s"
+          s = mediator.construct name
+        end
+        
+        sub s, d, options, &block
+      end
     end
 
     def one name, options = nil, &block

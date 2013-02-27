@@ -198,19 +198,32 @@ describe Mediator::Parser do
 
   describe "many" do
     before do
-      Many   = Class.new OpenStruct
-      Nested = Class.new OpenStruct 
+      Bar ||= Class.new OpenStruct
+      Foo ||= Class.new OpenStruct 
 
       Class.new Mediator do
-        accept Many
+        accept Bar
 
         def parse! p
-          p.many :nest
+          p.many :foos
+          p.many :replace_foos, replace: true
+        end
+
+        def construct name
+          # name is either foo, replace_foo, replace_foos or foos..
+          subject.foos         ||= []
+          subject.replace_foos ||= []
+
+          return subject.send(name) if subject.respond_to?(name)
+
+          foo = Foo.new
+          subject.send("#{name}s") << foo
+          foo
         end
       end
 
       Class.new Mediator do
-        accept Nested
+        accept Foo
 
         def parse! p
           p.key :baz
@@ -219,15 +232,38 @@ describe Mediator::Parser do
     end
 
     it "delegates to an array of nested mediator" do
-      s      = Many.new
-      s.nest = [ Nested.new, Nested.new ]
+      s  = Bar.new
 
       m = Mediator[s]
-      d = { nest: [ { baz: "baz!" }, { baz: "blup?" } ] }
+      d = { foos: [ { baz: "baz!" }, { baz: "blup?" } ] }
 
       m.parse d
 
-      assert_equal d[:nest].map { |v| v[:baz] },  s.nest.map { |v| v.baz }
+      assert_equal d[:foos].map { |v| v[:baz] },  s.foos.map { |v| v.baz }
+    end
+
+    it "only adds new models by default" do
+      s  = Bar.new foos: [ Foo.new(baz: "bar") ]
+
+      m = Mediator[s]
+      d = { foos: [ { baz: "blup?" } ] }
+
+      m.parse d
+
+      assert_equal ["bar", "blup?"], s.foos.map(&:baz)
+    end
+
+    it "only replaces all models if told to" do
+      s  = Bar.new replace_foos: [ Foo.new(baz: "bar") ]
+
+      assert_equal ["bar"], s.replace_foos.map(&:baz)
+
+      m = Mediator[s]
+      d = { replace_foos: [ { baz: "blup?" } ] }
+
+      m.parse d
+
+      assert_equal ["blup?"],  s.replace_foos.map(&:baz)
     end
   end
 
