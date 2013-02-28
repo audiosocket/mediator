@@ -319,7 +319,7 @@ describe Mediator::Renderer do
         end
 
         def render! r
-          r.key :foo
+          r.key :foo, construct: true
         end
       end
 
