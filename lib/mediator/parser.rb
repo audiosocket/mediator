@@ -54,17 +54,14 @@ class Mediator
     def many name, options = {}, &block
       options = {construct: true}.merge options
 
-      mediator.set name, [] if options && options[:replace]
+      mediator.set name, [] unless options[:merge]
 
       data = get(name, options) || []
       subj = (options && options[:subject]) || mediator.get(name, options)
 
       data.each do |d|
-        unless d[:id] and s = subj.detect { |s| s.id == d[:id] }
-          name = name[0..-2] if name[-1] == "s"
-          s = mediator.construct name
-        end
-        
+        name = name[0..-2] if name[-1] == "s"
+        s = mediator.construct name
         sub s, d, options, &block
       end
     end

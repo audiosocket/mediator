@@ -206,13 +206,13 @@ describe Mediator::Parser do
 
         def parse! p
           p.many :foos
-          p.many :replace_foos, replace: true
+          p.many :merge_foos, merge: true
         end
 
         def construct name
           # name is either foo, replace_foo, replace_foos or foos..
           subject.foos         ||= []
-          subject.replace_foos ||= []
+          subject.merge_foos ||= []
 
           return subject.send(name) if subject.respond_to?(name)
 
@@ -242,28 +242,28 @@ describe Mediator::Parser do
       assert_equal d[:foos].map { |v| v[:baz] },  s.foos.map { |v| v.baz }
     end
 
-    it "only adds new models by default" do
+    it "replaces all models by default" do
       s  = Bar.new foos: [ Foo.new(baz: "bar") ]
+
+      assert_equal ["bar"], s.foos.map(&:baz)
 
       m = Mediator[s]
       d = { foos: [ { baz: "blup?" } ] }
 
       m.parse d
 
-      assert_equal ["bar", "blup?"], s.foos.map(&:baz)
+      assert_equal ["blup?"],  s.foos.map(&:baz)
     end
 
-    it "only replaces all models if told to" do
-      s  = Bar.new replace_foos: [ Foo.new(baz: "bar") ]
-
-      assert_equal ["bar"], s.replace_foos.map(&:baz)
+    it "adds new models if told to" do
+      s  = Bar.new merge_foos: [ Foo.new(baz: "bar") ]
 
       m = Mediator[s]
-      d = { replace_foos: [ { baz: "blup?" } ] }
+      d = { merge_foos: [ { baz: "blup?" } ] }
 
       m.parse d
 
-      assert_equal ["blup?"],  s.replace_foos.map(&:baz)
+      assert_equal ["bar", "blup?"], s.merge_foos.map(&:baz)
     end
   end
 
