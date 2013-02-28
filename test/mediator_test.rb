@@ -136,7 +136,7 @@ describe Mediator do
       assert_equal :bar, m.get(:foo)
     end
 
-    it "can construct missing values" do
+    it "can construct missing values if told to" do
       c = Class.new Mediator do
         def construct name
           "HELLO" if :foo == name
@@ -144,7 +144,7 @@ describe Mediator do
       end
 
       m = c.new OpenStruct.new
-      assert_equal "HELLO", m.get(:foo)
+      assert_equal "HELLO", m.get(:foo, construct: true)
     end
   end
 

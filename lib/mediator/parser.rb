@@ -10,14 +10,14 @@ class Mediator
       @mediator = mediator
     end
 
-    def get name, options = nil
-      selector = (options && options[:from]) || name
-      (options && options[:value]) || data[selector] || data[selector.to_s]
+    def get name, options = {}
+      selector = options[:from] || name
+      options[:value] || data[selector] || data[selector.to_s]
     end
 
-    def has? name, options = nil
-      selector = (options && options[:from]) || name
-      (options && options.has_key?(:value))  || mediator.data_has?(data,selector)
+    def has? name, options = {}
+      selector = options[:from] || name
+      options.has_key?(:value)  || mediator.data_has?(data,selector)
     end
 
     def id name, options = {}
@@ -36,7 +36,7 @@ class Mediator
       key id_name, options
     end
 
-    def key name, options = nil, &block
+    def key name, options = {}, &block
       if name[-1] == "?"
         name = name[0..-2].intern
       end
@@ -51,11 +51,13 @@ class Mediator
       mediator.set name, value unless empty? value, options
     end
 
-    def many name, options = nil, &block
+    def many name, options = {}, &block
+      options = {construct: true}.merge options
+
       mediator.set name, [] if options && options[:replace]
 
       data = get(name, options) || []
-      subj = (options && options[:subject]) || mediator.get(name)
+      subj = (options && options[:subject]) || mediator.get(name, options)
 
       data.each do |d|
         unless d[:id] and s = subj.detect { |s| s.id == d[:id] }
@@ -67,15 +69,17 @@ class Mediator
       end
     end
 
-    def one name, options = nil, &block
+    def one name, options = {}, &block
+      options = {construct: true}.merge options
+
       data = get name, options
-      subj = (options && options[:subject]) || mediator.get(name)
+      subj = options[:subject] || mediator.get(name, options)
 
       sub subj, data, options, &block
     end
 
-    def union name, options = nil, &block
-      (options ||= {}).merge! value: self.data
+    def union name, options = {}, &block
+      options = {value: self.data}.merge options
       one name, options, &block
     end
 

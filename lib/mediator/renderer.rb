@@ -10,14 +10,15 @@ class Mediator
       @mediator = mediator
     end
 
-    def get name, options = nil
-      selector = (options && options[:from]) || name
-      (options && options[:value]) || mediator.get(selector)
+    def get name, options = {}
+      options = {construct: false}.merge options
+      selector = options[:from] || name
+      options[:value] || mediator.get(selector, options)
     end
 
-    def has? name, options = nil
-      selector = (options && options[:from]) || name
-      (options && options.has_key?(:value))  || mediator.subject_has?(selector)
+    def has? name, options = {}
+      selector = options[:from] || name
+      options.has_key?(:value)  || mediator.subject_has?(selector)
     end
 
     def id name, options = {}, &block
@@ -36,9 +37,9 @@ class Mediator
       key name, options, &block
     end
 
-    def key name, options = nil, &block
+    def key name, options = {}, &block
       if name[-1] == "?"
-        (options ||= {})[:from] = name
+        options[:from] = name
         name = name[0..-2].intern
       end
 
@@ -50,24 +51,24 @@ class Mediator
       data[name] = value unless empty? value, options
     end
 
-    def many name, options = nil, &block
+    def many name, options = {}, &block
       value = get name, options
       data[name] = value.map { |v| sub v, options, &block }.
         reject { |v| empty? v, options }
     end
 
-    def one name, options = nil, &block
+    def one name, options = {}, &block
       value = get name, options
       return if empty? value, options
  
       value = sub value, options, &block 
       return if empty? value, options
 
-      options && options[:merge] ? data.merge!(value) : data[name] = value
+      options[:merge] ? data.merge!(value) : data[name] = value
     end
 
-    def union name, options = nil, &block
-      (options ||= {}).merge! merge: true
+    def union name, options = {}, &block
+      options.merge! merge: true
       one name, options, &block
     end
 

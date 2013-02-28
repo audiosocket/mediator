@@ -152,9 +152,9 @@ class Mediator
   # Gets the `name` property from `subject`. The default
   # implementation calls the `name` method if it exists.
 
-  def get name
+  def get name, options = {}
     value = subject.send name if subject.respond_to? name
-    value = construct name    if value.nil?
+    value = construct name    if value.nil? and options[:construct]
 
     getting name, value       unless value.nil?
   end
