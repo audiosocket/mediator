@@ -55,7 +55,7 @@ class Mediator
       options = {construct: true}.merge options
 
       data = get(name, options)
-      return if empty? data, options
+      return if data.nil? and !options[:empty] # Can't use main empty? call here as [] does not count as empty..
 
       mediator.set name, [] unless options[:merge]
 

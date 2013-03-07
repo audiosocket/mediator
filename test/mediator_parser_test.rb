@@ -255,7 +255,7 @@ describe Mediator::Parser do
       assert_equal ["blup?"],  s.foos.map(&:baz)
     end
 
-    it "does not nothing with nil values by default" do
+    it "does nothing with nil values by default" do
       s  = Bar.new foos: [ Foo.new(baz: "bar") ]
 
       assert_equal ["bar"], s.foos.map(&:baz)
@@ -266,6 +266,19 @@ describe Mediator::Parser do
       m.parse d
 
       assert_equal ["bar"],  s.foos.map(&:baz)
+    end
+
+    it "does something with []" do
+      s  = Bar.new foos: [ Foo.new(baz: "bar") ]
+
+      assert_equal ["bar"], s.foos.map(&:baz)
+
+      m = Mediator[s]
+      d = { foos: [] }
+
+      m.parse d
+
+      assert_equal [],  s.foos.map(&:baz)
     end
 
     it "adds new models if told to" do
