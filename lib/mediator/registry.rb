@@ -1,4 +1,5 @@
 require "mediator/errors"
+require "ostruct"
 
 class Mediator
   module Registry
@@ -31,6 +32,11 @@ class Mediator
     #   registry - optional registry map to use instead of default
 
     def for subject, opts = {}
+      # Return a dummy mediator is subject is nil
+      # (can happen with r.one :foo, empty: true)
+
+      return OpenStruct.new render: nil if subject == nil
+
       context = opts[:context]
 
       reg = registry(opts[:registry] || context)

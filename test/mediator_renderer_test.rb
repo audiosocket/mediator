@@ -356,5 +356,21 @@ describe Mediator::Renderer do
 
       assert_equal e, d
     end
+
+    it "does not barf if associated object is nil and empty is true" do
+      c = Class.new Mediator do
+        def render! r
+          r.one :foo, empty: true
+        end
+      end
+
+      s = OpenStruct.new foo: nil
+
+      m = c.new s
+      d = m.render
+      e = {foo: nil}
+
+      assert_equal e, d
+    end
   end
 end
