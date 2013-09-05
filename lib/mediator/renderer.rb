@@ -67,6 +67,14 @@ class Mediator
       options[:merge] ? data.merge!(value) : data[name] = value
     end
 
+    def nested name, &block
+      return unless block
+      r = mediator.renderer
+      block[r]
+
+      data[name] = r.data
+    end
+
     def union name, options = {}, &block
       options.merge! merge: true
       one name, options, &block
@@ -78,6 +86,5 @@ class Mediator
       rendered = Mediator[value, context: mediator].render
       block ? block[rendered] : rendered
     end
-
   end
 end

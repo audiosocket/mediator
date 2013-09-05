@@ -328,4 +328,29 @@ describe Mediator::Parser do
       assert_equal "bar", s.second
     end
   end
+
+  describe "nested" do
+    it "parse values nested under given name" do
+      Thing = Class.new OpenStruct
+
+      Class.new Mediator do
+        accept Thing
+
+        def parse! p
+          p.nested :foo do |p|
+            p.key :bar
+          end
+        end
+      end
+
+      t = Thing.new
+
+      m = Mediator[t]
+
+      m.parse foo: { bar: "berg" }
+
+      assert_equal "berg", t.bar
+    end
+  end
+
 end

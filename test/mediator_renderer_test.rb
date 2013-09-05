@@ -373,4 +373,26 @@ describe Mediator::Renderer do
       assert_equal e, d
     end
   end
+
+  describe "nested" do
+    it "renders subject under a given name" do
+      c = Class.new Mediator do
+        accept OpenStruct
+        def render! r
+          r.nested :bar do |r|
+            r.key :foo
+          end
+        end
+      end
+
+      x = OpenStruct.new foo: "tball"
+
+      m = c.new x
+      d = m.render
+      e = { bar: { foo: "tball" } }
+
+      assert_equal e, d
+    end
+  end
+
 end

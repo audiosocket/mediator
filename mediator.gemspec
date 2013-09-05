@@ -9,7 +9,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = `git ls-files -- test/*`.split "\n"
   gem.name          = "mediator"
   gem.require_paths = ["lib"]
-  gem.version       = "0.4.2"
+  gem.version       = "0.5.2"
 
   gem.required_ruby_version = ">= 1.9.2"
 end

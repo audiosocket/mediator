@@ -82,6 +82,12 @@ class Mediator
       one name, options, &block
     end
 
+    def nested name, &block
+      return unless block
+      p = mediator.parser data[name]
+      block[p]
+    end
+
     private
 
     def sub subj, data, options, &block
