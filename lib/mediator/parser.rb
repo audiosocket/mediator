@@ -82,8 +82,8 @@ class Mediator
       one name, options, &block
     end
 
-    def nested name, &block
-      return unless block
+    def nested name, options = {}, &block
+      return if !block or empty? data[name], options
       p = mediator.parser data[name]
       block[p]
     end
