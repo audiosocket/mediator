@@ -67,11 +67,12 @@ class Mediator
       options[:merge] ? data.merge!(value) : data[name] = value
     end
 
-    def nested name, &block
+    def nested name, options = {},  &block
       return unless block
       r = mediator.renderer
       block[r]
 
+      return if empty? r.data, options
       data[name] = r.data
     end
 
