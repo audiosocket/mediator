@@ -81,6 +81,15 @@ class Mediator
       one name, options, &block
     end
 
+    def hash name, options = {}, &block
+      value = get name, options
+      return if empty? value, options
+
+      value.each do |k, v|
+        key k.to_sym, value: v
+      end
+    end
+
     private
 
     def sub value, options, &block

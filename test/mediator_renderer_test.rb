@@ -435,4 +435,20 @@ describe Mediator::Renderer do
     end
   end
 
+  describe "hash" do
+    it "grabs the value from the subject" do
+      c = Class.new Mediator do
+        def render! r
+          r.hash :hashie
+        end
+      end
+
+      s = OpenStruct.new hashie: {foo: "foo", bar: "bar"}
+      m = c.new s
+      d = m.render
+
+      assert_equal "foo", d[:foo]
+      assert_equal "bar", d[:bar]
+    end
+  end
 end

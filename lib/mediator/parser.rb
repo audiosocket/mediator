@@ -88,6 +88,22 @@ class Mediator
       block[p]
     end
 
+    def hash name, options = {}, &block
+      hash = mediator.get name, options
+
+      excludes = options[:exclude] || []
+
+      unless hash
+        hash = {}
+        mediator.set name, hash
+      end
+
+      data.reject { |k, v| excludes.include? k.to_sym }.each do |k, v|
+        hash[k.to_sym] = v
+      end
+
+    end
+
     private
 
     def sub subj, data, options, &block

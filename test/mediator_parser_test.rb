@@ -353,4 +353,43 @@ describe Mediator::Parser do
     end
   end
 
+  describe "hash" do
+    it "should parse hash with no exclude" do
+      Hashie = Class.new OpenStruct
+
+      Class.new Mediator do
+        accept Hashie
+
+        def parse! p
+          p.hash :custom
+        end
+      end
+
+      t = Hashie.new
+
+      m = Mediator[t]
+
+      m.parse bar: "berg"
+      assert_equal "berg", t.custom[:bar]
+    end
+
+    it "should parse hash with exclude" do
+      Hashie = Class.new OpenStruct
+
+      Class.new Mediator do
+        accept Hashie
+
+        def parse! p
+          p.hash :custom, exclude: [:fish]
+        end
+      end
+
+      t = Hashie.new
+
+      m = Mediator[t]
+
+      m.parse bar: "berg", fish: "bass"
+      assert_equal "berg", t.custom[:bar]
+    end
+  end
 end
