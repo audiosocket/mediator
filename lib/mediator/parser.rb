@@ -93,15 +93,13 @@ class Mediator
 
       excludes = options[:exclude] || []
 
-      unless hash
-        hash = {}
-        mediator.set name, hash
-      end
+      hash = (hash || {}).dup
 
       data.reject { |k, v| excludes.include? k.to_sym }.each do |k, v|
-        hash[k.to_sym] = v
+        hash[k.to_s] = v
       end
 
+      mediator.set name, hash
     end
 
     private
