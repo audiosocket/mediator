@@ -28,7 +28,7 @@ class Mediator
     def ids name, options = {}, &block
       unless options[:from]
         if name[-1] == "s"
-          options = options.merge(from: "#{name[0..-2]}_ids")
+          options = options.merge(from: "#{name.to_s.singularize}_ids")
         else
           options = options.merge(from: "#{name}_ids")
         end

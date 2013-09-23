@@ -12,4 +12,6 @@ Gem::Specification.new do |gem|
   gem.version       = "0.5.2"
 
   gem.required_ruby_version = ">= 1.9.2"
+
+  gem.add_dependency "activesupport", "~> 3.2.6"
 end
