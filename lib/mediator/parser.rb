@@ -91,12 +91,16 @@ class Mediator
     def hash name, options = {}, &block
       hash = mediator.get name, options
 
-      excludes = options[:exclude] || []
+      exclude = options[:exclude] || []
 
       hash = (hash || {}).dup
 
-      data.reject { |k, v| excludes.include? k.to_sym }.each do |k, v|
-        hash[k.to_s] = v
+      if exclude.respond_to? :call
+        hash = hash.merge(data.reject(&exclude))
+      else
+        data.reject { |k, v| exclude.include? k.to_sym }.each do |k, v|
+          hash[k.to_sym] = v
+        end
       end
 
       mediator.set name, hash
