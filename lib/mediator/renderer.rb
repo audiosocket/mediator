@@ -60,8 +60,8 @@ class Mediator
     def one name, options = {}, &block
       value = get name, options
       return if empty? value, options
- 
-      value = sub value, options, &block 
+
+      value = sub value, options, &block
       return if empty? value, options
 
       options[:merge] ? data.merge!(value) : data[name] = value
@@ -73,7 +73,8 @@ class Mediator
       block[r]
 
       return if empty? r.data, options
-      data[name] = r.data
+      data[name] ||= {}
+      data[name] = data[name].merge r.data
     end
 
     def union name, options = {}, &block
