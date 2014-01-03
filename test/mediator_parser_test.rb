@@ -42,6 +42,14 @@ describe Mediator::Parser do
       p.id :foo, empty: true
       assert_equal "", @subject.foo_id
     end
+
+    it "Does not consider 0 empty" do
+      p = Mediator::Parser.new @mediator, foo: 0
+      @subject.foo_id = 42
+
+      p.id :foo
+      assert_equal 0, @subject.foo_id
+    end
   end
 
   describe "ids" do

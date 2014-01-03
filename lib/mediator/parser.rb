@@ -72,6 +72,10 @@ class Mediator
       options = {construct: true}.merge options
 
       data = get name, options
+      # mediator.get below may create an empty object
+      # so we need to bail out now..
+      return if data.nil? and !options[:empty]
+
       subj = options[:subject] || mediator.get(name, options)
 
       sub subj, data, options, &block
