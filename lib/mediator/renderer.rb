@@ -28,7 +28,7 @@ class Mediator
     def ids name, options = {}, &block
       unless options[:from]
         if name[-1] == "s"
-          options = options.merge(from: "#{name[0..-2]}_ids")
+          options = options.merge(from: "#{name.to_s.singularize}_ids")
         else
           options = options.merge(from: "#{name}_ids")
         end
@@ -60,16 +60,35 @@ class Mediator
     def one name, options = {}, &block
       value = get name, options
       return if empty? value, options
- 
-      value = sub value, options, &block 
+
+      value = sub value, options, &block
       return if empty? value, options
 
       options[:merge] ? data.merge!(value) : data[name] = value
     end
 
+    def nested name, options = {},  &block
+      return unless block
+      r = mediator.renderer
+      block[r]
+
+      return if empty? r.data, options
+      data[name] ||= {}
+      data[name] = data[name].merge r.data
+    end
+
     def union name, options = {}, &block
       options.merge! merge: true
       one name, options, &block
+    end
+
+    def hash name, options = {}, &block
+      value = get name, options
+      return if empty? value, options
+
+      value.each do |k, v|
+        key k.to_sym, value: v
+      end
     end
 
     private
@@ -78,6 +97,5 @@ class Mediator
       rendered = Mediator[value, context: mediator].render
       block ? block[rendered] : rendered
     end
-
   end
 end

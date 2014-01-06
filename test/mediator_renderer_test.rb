@@ -373,4 +373,82 @@ describe Mediator::Renderer do
       assert_equal e, d
     end
   end
+
+  describe "nested" do
+    it "renders subject under a given name" do
+      c = Class.new Mediator do
+        accept OpenStruct
+        def render! r
+          r.nested :bar do |r|
+            r.key :foo
+          end
+        end
+      end
+
+      x = OpenStruct.new foo: "tball"
+
+      m = c.new x
+      d = m.render
+      e = { bar: { foo: "tball" } }
+
+      assert_equal e, d
+    end
+
+    it "renders nothing for nested field if it's empty" do
+      c = Class.new Mediator do
+        accept OpenStruct
+        def render! r
+          r.key :baz
+          r.nested :bar do |r|
+            r.key :foo
+          end
+        end
+      end
+
+      x = OpenStruct.new baz: "hey"
+
+      m = c.new x
+      d = m.render
+      e = { baz: "hey"}
+
+      assert_equal e, d
+    end
+
+    it "renders nested field if empty is true" do
+      c = Class.new Mediator do
+        accept OpenStruct
+        def render! r
+          r.key :baz
+          r.nested :bar, empty: true do |r|
+            r.key :foo
+          end
+        end
+      end
+
+      x = OpenStruct.new baz: "hey"
+
+      m = c.new x
+      d = m.render
+      e = { baz: "hey", bar: {} }
+
+      assert_equal e, d
+    end
+  end
+
+  describe "hash" do
+    it "grabs the value from the subject" do
+      c = Class.new Mediator do
+        def render! r
+          r.hash :hashie
+        end
+      end
+
+      s = OpenStruct.new hashie: {foo: "foo", bar: "bar"}
+      m = c.new s
+      d = m.render
+
+      assert_equal "foo", d[:foo]
+      assert_equal "bar", d[:bar]
+    end
+  end
 end

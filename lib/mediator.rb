@@ -1,3 +1,4 @@
+require "active_support/inflector"
 require "mediator/errors"
 require "mediator/parser"
 require "mediator/registry"
@@ -144,7 +145,7 @@ class Mediator
   end
 
   # True if data can return a value for name
-  
+
   def data_has? data, name
     data.has_key?(name) || data.has_key?(name.to_s)
   end

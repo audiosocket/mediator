@@ -42,6 +42,14 @@ describe Mediator::Parser do
       p.id :foo, empty: true
       assert_equal "", @subject.foo_id
     end
+
+    it "Does not consider 0 empty" do
+      p = Mediator::Parser.new @mediator, foo: 0
+      @subject.foo_id = 42
+
+      p.id :foo
+      assert_equal 0, @subject.foo_id
+    end
   end
 
   describe "ids" do
@@ -326,6 +334,70 @@ describe Mediator::Parser do
 
       assert_equal "foo", f.first
       assert_equal "bar", s.second
+    end
+  end
+
+  describe "nested" do
+    it "parse values nested under given name" do
+      Thing = Class.new OpenStruct
+
+      Class.new Mediator do
+        accept Thing
+
+        def parse! p
+          p.nested :foo do |p|
+            p.key :bar
+          end
+        end
+      end
+
+      t = Thing.new
+
+      m = Mediator[t]
+
+      m.parse foo: { bar: "berg" }
+
+      assert_equal "berg", t.bar
+    end
+  end
+
+  describe "hash" do
+    it "should parse hash with no exclude" do
+      Hashie = Class.new OpenStruct
+
+      Class.new Mediator do
+        accept Hashie
+
+        def parse! p
+          p.hash :custom
+        end
+      end
+
+      t = Hashie.new
+
+      m = Mediator[t]
+
+      m.parse bar: "berg"
+      assert_equal "berg", t.custom[:bar]
+    end
+
+    it "should parse hash with exclude" do
+      Hashie = Class.new OpenStruct
+
+      Class.new Mediator do
+        accept Hashie
+
+        def parse! p
+          p.hash :custom, exclude: [:fish]
+        end
+      end
+
+      t = Hashie.new
+
+      m = Mediator[t]
+
+      m.parse bar: "berg", fish: "bass"
+      assert_equal "berg", t.custom[:bar]
     end
   end
 end
