@@ -167,8 +167,8 @@ describe Mediator::Parser do
 
   describe "one" do
     before do
-      Top  = Class.new OpenStruct
-      Nest = Class.new OpenStruct
+      Top  ||= Class.new OpenStruct
+      Nest ||= Class.new OpenStruct
 
       Class.new Mediator do
         accept Top
@@ -176,6 +176,7 @@ describe Mediator::Parser do
         def parse! p
           p.key :foo
           p.one :nest
+          p.one :may_be_empty, empty: true
         end
       end
 
@@ -202,6 +203,31 @@ describe Mediator::Parser do
       assert_equal d[:nest][:baz],  s.nest.baz
       assert_equal d[:nest][:quux], s.nest.quux
     end
+
+    it "sets to nil when empty: true is used and a value is passed" do
+      s = Top.new
+      s.may_be_empty = Nest.new bla: :blo
+
+      m = Mediator[s]
+      d = { may_be_empty: nil }
+
+      m.parse d
+
+      assert_nil s.may_be_empty
+    end
+
+    it "does nothing when empty: true is used but no value is passed" do
+      s = Top.new
+      may_be_empty = Nest.new bla: :blo
+      s.may_be_empty = may_be_empty
+
+      m = Mediator[s]
+      d = { foo: "bar" }
+
+      m.parse d
+
+      assert_equal may_be_empty, s.may_be_empty
+    end
   end
 
   describe "many" do
@@ -215,11 +241,12 @@ describe Mediator::Parser do
         def parse! p
           p.many :foos
           p.many :merge_foos, merge: true
+          p.many :may_be_empty, empty: true
         end
 
         def construct name
           # name is either foo, replace_foo, replace_foos or foos..
-          subject.foos         ||= []
+          subject.foos       ||= []
           subject.merge_foos ||= []
 
           return subject.send(name) if subject.respond_to?(name)
@@ -274,6 +301,30 @@ describe Mediator::Parser do
       m.parse d
 
       assert_equal ["bar"],  s.foos.map(&:baz)
+    end
+
+    it "sets to nil when empty: true is used and a value is passed" do
+      s = Bar.new may_be_empty: [ Foo.new(baz: "bar") ]
+
+      m = Mediator[s]
+      d = { may_be_empty: nil }
+
+      m.parse d
+
+      assert_nil s.may_be_empty
+    end
+
+    it "does nothing when empty: true is used but no value is passed" do
+      s = Bar.new
+      may_be_empty = [ Foo.new(baz: "bar") ]
+      s.may_be_empty = may_be_empty
+
+      m = Mediator[s]
+      d = { foos: [ { baz: "bar" } ] }
+
+      m.parse d
+
+      assert_equal may_be_empty, s.may_be_empty
     end
 
     it "does something with []" do
@@ -363,7 +414,7 @@ describe Mediator::Parser do
 
   describe "hash" do
     it "should parse hash with no exclude" do
-      Hashie = Class.new OpenStruct
+      Hashie ||= Class.new OpenStruct
 
       Class.new Mediator do
         accept Hashie
@@ -382,7 +433,7 @@ describe Mediator::Parser do
     end
 
     it "should parse hash with exclude" do
-      Hashie = Class.new OpenStruct
+      Hashie ||= Class.new OpenStruct
 
       Class.new Mediator do
         accept Hashie

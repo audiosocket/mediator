@@ -55,7 +55,11 @@ class Mediator
       options = {construct: true}.merge options
 
       data = get(name, options)
-      return if data.nil? and !options[:empty] # Can't use main empty? call here as [] does not count as empty..
+
+      if data.nil?
+        mediator.set name, nil if has?(name) and options[:empty]
+        return
+      end
 
       mediator.set name, [] unless options[:merge]
 
@@ -72,10 +76,12 @@ class Mediator
       options = {construct: true}.merge options
 
       data = get name, options
-      # mediator.get below may create an empty object
-      # so we need to bail out now..
-      return if data.nil? and !options[:empty]
 
+      if data.nil?     
+        mediator.set name, nil if has?(name) and options[:empty]
+        return
+      end
+    
       subj = options[:subject] || mediator.get(name, options)
 
       sub subj, data, options, &block
@@ -113,7 +119,7 @@ class Mediator
     private
 
     def sub subj, data, options, &block
-      return if empty? data, options or subj.nil?
+      return if (empty?(data, options) and !options[:empty]) or subj.nil?
 
       Mediator[subj, context: mediator].parse data
       block[subj] if block
