@@ -119,7 +119,7 @@ class Mediator
     private
 
     def sub subj, data, options, &block
-      return if (empty?(data, options) and !options[:empty]) or subj.nil?
+      return if empty? data, options or subj.nil?
 
       Mediator[subj, context: mediator].parse data
       block[subj] if block
